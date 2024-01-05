@@ -2,26 +2,26 @@ package main
 
 import (
 	"fmt"
+	rl "github.com/gen2brain/raylib-go/raylib"
 	"math"
 	"math/rand"
 	"time"
-	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 type Scene struct {
-	width     int
-	height    int
-	scale     int
-	snake     []rl.Vector2
-	snakeAbs  []rl.Vector2
-	velocity  rl.Vector2
-	apple     rl.Vector2
-	textures  struct {
-		apple rl.Texture2D
-		head  rl.Texture2D
-		body  rl.Texture2D
-		corner  rl.Texture2D
-		tail  rl.Texture2D
+	width    int
+	height   int
+	scale    int
+	snake    []rl.Vector2
+	snakeAbs []rl.Vector2
+	velocity rl.Vector2
+	apple    rl.Vector2
+	textures struct {
+		apple  rl.Texture2D
+		head   rl.Texture2D
+		body   rl.Texture2D
+		corner rl.Texture2D
+		tail   rl.Texture2D
 	}
 }
 
@@ -67,7 +67,9 @@ func (s *Scene) Update() {
 	velocity := s.velocity
 	for {
 		key := rl.GetKeyPressed()
-		if key == 0 {break}
+		if key == 0 {
+			break
+		}
 		if velocity.X == 0 {
 			if key == rl.KeyA || key == rl.KeyLeft {
 				s.velocity = rl.Vector2{X: -1, Y: 0}
@@ -89,7 +91,7 @@ func (s *Scene) Update() {
 	}
 
 	// move snake
-	for i := len(s.snake)-1; i >= 1; i-- {
+	for i := len(s.snake) - 1; i >= 1; i-- {
 		s.snake[i] = s.snake[i-1]
 		s.snakeAbs[i] = s.snakeAbs[i-1]
 	}
@@ -119,7 +121,7 @@ func (s *Scene) Update() {
 		s.snake = append(s.snake, s.snake[len(s.snake)-1])
 		s.snakeAbs = append(s.snakeAbs, s.snake[len(s.snake)-1])
 		s.placeApple()
-		rl.SetTargetFPS(int32(16 + len(s.snake) / 4))
+		rl.SetTargetFPS(int32(16 + len(s.snake)/4))
 	}
 
 	// snake bumps into itself
@@ -134,7 +136,7 @@ func (s *Scene) Update() {
 
 func RenderRotated(t rl.Texture2D, position rl.Vector2, direction rl.Vector2) {
 	angle := rl.Vector2Angle(rl.Vector2{X: 1, Y: 0}, direction) / math.Pi * 180
-	offset := rl.Vector2Scale(rl.Vector2Subtract(rl.Vector2One(), rl.Vector2Rotate(rl.Vector2One(), angle * math.Pi / 180)), 0.5)
+	offset := rl.Vector2Scale(rl.Vector2Subtract(rl.Vector2One(), rl.Vector2Rotate(rl.Vector2One(), angle*math.Pi/180)), 0.5)
 	position = rl.Vector2Add(position, rl.Vector2Scale(offset, float32(t.Width)))
 	rl.DrawTextureEx(t, position, angle, 1, rl.White)
 
@@ -146,7 +148,9 @@ func (s *Scene) Render() {
 	rl.ClearBackground(rl.Color{173, 214, 68, 255})
 	for y := 0; y < s.height; y += 1 {
 		x := 0
-		if y % 2 == 1 {x = 1}
+		if y%2 == 1 {
+			x = 1
+		}
 		for ; x < s.width; x += 2 {
 			rl.DrawRectangle(int32(x)*scale, int32(y)*scale, scale, scale, rl.Color{166, 209, 60, 255})
 		}
@@ -185,7 +189,7 @@ func (s *Scene) Render() {
 	// score
 	rl.DrawText(fmt.Sprint("Score: ", len(s.snake)), 5, 5, 20, rl.RayWhite)
 	//rl.DrawFPS(920, 5)
-	rl.DrawText(fmt.Sprintf("%.0f FPS", 1 / rl.GetFrameTime()), 1200, 5, 20, rl.Color{80, 80, 80, 255})
+	rl.DrawText(fmt.Sprintf("%.0f FPS", 1/rl.GetFrameTime()), 1200, 5, 20, rl.Color{80, 80, 80, 255})
 }
 
 func (s Scene) gameOver() {
@@ -194,7 +198,7 @@ func (s Scene) gameOver() {
 	centerY := s.height * s.scale / 2
 	rl.DrawText("GAME OVER!", int32(centerX-120), int32(centerY-20), 40, rl.White)
 	rl.EndDrawing()
-	time.Sleep(time.Second)
+	time.Sleep(2 * time.Second)
 }
 
 func main() {
